@@ -134,5 +134,6 @@ fi
 
 echo
 info "Proceeding with $green$MY_SAGE_CMD$normal\n"
+# TODO: make the max memory user configurable
 ulimit -v 3000000 # 3.0G of max virtual memory
 exec $MY_SAGE_CMD ${@}
