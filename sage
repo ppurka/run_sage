@@ -30,22 +30,23 @@
 
 
 ##########################    USER CONFIG   ###############################
-SAGE_DIR="$HOME/Installations" # Directory where all the sage versions are
-                               # installed. For instance, sage-5.8 would be
-                               # installed as $SAGE_DIR/sage-5.8
-TERMINAL=""                    # Your favorite terminal
+MY_SAGE_DIR="$HOME/Installations"   # Directory where all the sage versions
+                                    # are installed. For instance, sage-5.8
+                                    # may be installed as
+                                    # $MY_SAGE_DIR/sage-5.8
+TERMINAL=""                         # Your favorite terminal
 ######################    END OF USER CONFIG   ############################
 
 
 
 #------------------------- Internal variables ----------------------------#
-declare -A SAGE_INSTALLATIONS
-declare -a SAGE_VERSIONS
+declare -A MY_SAGE_INSTALLATIONS
+declare -a MY_SAGE_VERSIONS
 NULL="/dev/null"
 DIALOG="$(which dialog 2> $NULL)" || DIALOG="$(which whiptail 2> $NULL)"
 self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
-SAGE_CMD=""
+MY_SAGE_CMD=""
 
 # Sanity checks
 # 1. Check for a minimum value of bash. Need associative arrays from ver. 4
@@ -87,10 +88,10 @@ if [[ ! -f "$conf" ]]; then
     mkdir -p "${conf%/*}" && touch "$conf" ||
         die "Could not create file $yellow$conf$normal"
 fi
-for d in "$SAGE_DIR"/sage-[0-9].*; do
+for d in "$MY_SAGE_DIR"/sage-[0-9].*; do
     if [[ -x "$d/sage" ]]; then
-        SAGE_VERSIONS+=( "${d#*-}" )
-        SAGE_INSTALLATIONS["${d#*-}"]="$d"
+        MY_SAGE_VERSIONS+=( "${d#*-}" )
+        MY_SAGE_INSTALLATIONS["${d#*-}"]="$d"
     fi
 done
 
@@ -100,8 +101,8 @@ done
 get_sage_list()
 {
     local last_used_ver="$( cat $conf )"
-    for s in ${SAGE_VERSIONS[@]}; do
-        if [[ "$last_used_ver" = "${SAGE_INSTALLATIONS[$s]}" ]]; then
+    for s in ${MY_SAGE_VERSIONS[@]}; do
+        if [[ "$last_used_ver" = "${MY_SAGE_INSTALLATIONS[$s]}" ]]; then
             echo -n "$s $s on "
         else
             echo -n "$s $s off "
@@ -111,15 +112,15 @@ get_sage_list()
 
 
 # Error checks
-[[ -z "${SAGE_VERSIONS[@]}" ]] && die "No sage installations found"
+[[ -z "${MY_SAGE_VERSIONS[@]}" ]] && die "No sage installations found"
 
 # Handle the case when it is not run as notebook
-if [[  ${#SAGE_VERSIONS[@]} -eq 1 || \
+if [[  ${#MY_SAGE_VERSIONS[@]} -eq 1 || \
     ( "$1" && "$1" != "-n" && "$1" != "--notebook" ) ]]; then
     last_used_ver="$( cat $conf )"
-    [[ "${SAGE_INSTALLATIONS[${last_used_ver#*-}]}" ]] &&
-        SAGE_CMD="$last_used_ver/sage" ||
-        SAGE_CMD="${SAGE_INSTALLATIONS[${SAGE_VERSIONS[0]}]}/sage"
+    [[ "${MY_SAGE_INSTALLATIONS[${last_used_ver#*-}]}" ]] &&
+        MY_SAGE_CMD="$last_used_ver/sage" ||
+        MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[${MY_SAGE_VERSIONS[0]}]}/sage"
 else
     out=$( get_sage_list )
     #TODO: replace displaymessage with $DIALOG?
@@ -127,11 +128,11 @@ else
         displaymessage --radiolist "Choose a Sage Installation" $out
         )"
     [[ $? -ne 0 ]] && exit
-    SAGE_CMD="${SAGE_INSTALLATIONS[$out]}/sage"
-    echo "${SAGE_INSTALLATIONS[$out]}" > "$conf"
+    MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[$out]}/sage"
+    echo "${MY_SAGE_INSTALLATIONS[$out]}" > "$conf"
 fi
 
 echo
-info "Proceeding with $green$SAGE_CMD$normal\n"
+info "Proceeding with $green$MY_SAGE_CMD$normal\n"
 ulimit -v 3000000 # 3.0G of max virtual memory
-exec $SAGE_CMD ${@}
+exec $MY_SAGE_CMD ${@}
