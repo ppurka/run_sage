@@ -5,6 +5,21 @@
         #                                           -ppurka         #
         #-----------------------------------------------------------#
 
+        #----------------- License: GPL-3 or later -----------------#
+        # Copyright (C) 2013  P. Purkayastha                        #
+        # Contact: ppurka _at_ gmail _dot_ com                      #
+        # This program comes with ABSOLUTELY NO WARRANTY;           #
+        # This is free software, and you are welcome to redistribute#
+        # it under certain conditions;                              #
+        #                                                           #
+        # For a brief summary of the license see the file COPYING   #
+        # that is distributed with this program.                    #
+        #                                                           #
+        # For the full text of the license see                      #
+        # http://www.gnu.org/licenses/gpl-3.0.html                  #
+        #-----------------------------------------------------------#
+
+
 
 . `which my_bash_functions 2> /dev/null` || {
     echo -e " \x1b[1;31mError!\x1b[0m The script \x1b[1;32mmy_bash_functions\
