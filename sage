@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
         #-----------------------------------------------------------#
         #   This program is used to start sage under ulimit         #
@@ -28,32 +28,66 @@
     exit 1
 }
 
+
+##########################    USER CONFIG   ###############################
+SAGE_DIR="$HOME/Installations" # Directory where all the sage versions are
+                               # installed. For instance, sage-5.8 would be
+                               # installed as $SAGE_DIR/sage-5.8
+TERMINAL=""                    # Your favorite terminal
+######################    END OF USER CONFIG   ############################
+
+
+
+#------------------------- Internal variables ----------------------------#
+declare -A SAGE_INSTALLATIONS
+declare -a SAGE_VERSIONS
+NULL="/dev/null"
+DIALOG="$(which dialog 2> $NULL)" || DIALOG="$(which whiptail 2> $NULL)"
 self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
-[[ ! -f "$conf" ]] && touch "$conf"
+SAGE_CMD=""
+
+# Sanity checks
+# 1. Check for a minimum value of bash. Need associative arrays from ver. 4
+bash --version | grep -q 'version 4' || die "Need bash version 4 or higher"
+
+# 2. Check if user provided TERMINAL is valid.
+if [[ "$TERMINAL" ]]; then
+    TERMINAL="$(which $TERMINAL 2> $NULL)" ||
+        die "$green$TERMINAL$normal not found in \$PATH."
+fi
+
+# 3. Check if dialog is present in the system.
+[[ -z "$DIALOG" ]] &&
+    die "Neither ${green}dialog$normal nor ${green}whiptail$normal was found in your \$PATH"
+
+
 
 # Display help in xterm if user clicked on the file
 if [[ "$DISPLAY" ]] && ! tty -s; then
     # first find a terminal
-    myterm=""
-    for terminal in terminology urxvt xterm; do
-        if which $terminal >& /dev/null; then
-            myterm="$terminal"
-            unset terminal
-            break
-        fi
-    done
-    case $myterm in
-        *terminology) exec $myterm -e "$(dirname "$0")/$(basename "$0") $@";;
-        *urxvt) exec $myterm -pe "" -e "$(dirname "$0")/$(basename "$0")" $@;;
-        *)      exec $myterm -e "$(dirname "$0")/$(basename "$0")" $@;;
+    if [[ -z "$TERMINAL" ]]; then
+        for t in terminology urxvt konsole xterm; do
+            if which $t >& $NULL; then
+                TERMINAL="$t"
+                unset t
+                break
+            fi
+        done
+    fi
+    case $TERMINAL in
+        *terminology) exec $TERMINAL -e "$(dirname "$0")/$(basename "$0") $@";;
+        *urxvt) exec $TERMINAL -pe "" -e "$(dirname "$0")/$(basename "$0")" $@;;
+        *)      exec $TERMINAL -e "$(dirname "$0")/$(basename "$0")" $@;;
     esac
 fi
 
 
-declare -A SAGE_INSTALLATIONS
-declare -a SAGE_VERSIONS
-for d in ~/Installations/sage-[0-9].*; do
+if [[ ! -f "$conf" ]]; then
+    mkdir -p "${conf%/*}" && touch "$conf" ||
+        die "Could not create file $yellow$conf$normal"
+fi
+for d in "$SAGE_DIR"/sage-[0-9].*; do
     if [[ -x "$d/sage" ]]; then
         SAGE_VERSIONS+=( "${d#*-}" )
         SAGE_INSTALLATIONS["${d#*-}"]="$d"
@@ -88,6 +122,7 @@ if [[  ${#SAGE_VERSIONS[@]} -eq 1 || \
         SAGE_CMD="${SAGE_INSTALLATIONS[${SAGE_VERSIONS[0]}]}/sage"
 else
     out=$( get_sage_list )
+    #TODO: replace displaymessage with $DIALOG?
     out="$( DISPLAY=""
         displaymessage --radiolist "Choose a Sage Installation" $out
         )"
