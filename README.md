@@ -75,3 +75,7 @@ The following variables at the top of the script are user configurable.
    is called from a desktop file. It need not be set. The script will
    default to at least `xterm` in case it doesn't find some other terminal.
 
+Demo
+----
+
+This [YouTube video](http://www.youtube.com/watch?v=iRsWHC0t-Ik) shows the behavior.
