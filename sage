@@ -194,3 +194,5 @@ unset cols conf self rows last_used_ver ${COLORS[@]} COLORS MAX_MEMORY
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
+
+# vim: set ai et fdm=marker ff=unix sta sts=4 sw=4 ts=4 tw=75 :
