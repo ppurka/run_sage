@@ -9,6 +9,34 @@ Sage that is desired to be run can be chosen at run time. Additionally, the
 process is run with ulimit to ensure that it does not exceed certain memory
 limits.
 
+Behavior
+--------
+
+The behavior of the script is as follows. All the arguments it receives are
+passed on to a Sage process. It tries to do "The Right Thing" depending on
+the argument that is passed to the script.
+
+1. If it is run from a graphical interface, or from the desktop file, then
+   it opens a terminal process and runs itself in the terminal.
+
+2. If there are no arguments, or the first argument is `-n` or `--notebook`
+   then the script provides the user with a selection of the versions of
+   Sage that are installed. Once the user selects the Sage version, the
+   corresponding Sage is launched with the rest of the arguments. It also
+   writes this version of Sage into a config file in
+   `$HOME/.config/sage.config`.
+
+3. If any other argument is present, then the script first tries to run the
+   Sage version that is present in the config file. If the config file is
+   empty, or if the corresponding Sage installation is not found, then the
+   script tries the first Sage version that it finds installed. So, from
+   the perspective of the user, it behaves as if there was no intermediary
+   script between the Sage binary and the user command and as if the user
+   had run that Sage version directly.
+
+4. Irrespective of whether 2. or 3. ensues, the Sage process is run under
+   `ulimit`.
+
 The following files are present in the repository.
 
 1. `sage` - This is an executable file that must be configured at the
