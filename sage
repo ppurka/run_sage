@@ -190,7 +190,7 @@ ulimit -v $MAX_MEMORY
 
 # Remove cruft from the environment
 unset DIALOG MY_SAGE_DIR MY_SAGE_INSTALLATIONS MY_SAGE_VERSIONS NULL TERMINAL
-unset cols conf self rows last_used_ver ${COLORS[@]} COLORS MAX_MEMORY
+unset cols conf self rows last_used_ver ram ${COLORS[@]} COLORS MAX_MEMORY
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
