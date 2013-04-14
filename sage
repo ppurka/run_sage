@@ -148,8 +148,9 @@ get_sage_list()
 # Gather all the sage versions that are installed.
 for d in "$MY_SAGE_DIR"/sage-[0-9].*; do
     if [[ -x "$d/sage" ]]; then
-        MY_SAGE_VERSIONS+=( "${d#*-}" )
-        MY_SAGE_INSTALLATIONS["${d#*-}"]="$d"
+        dtmp="${d##*/}"
+        MY_SAGE_VERSIONS+=( "${dtmp#*-}" )
+        MY_SAGE_INSTALLATIONS["${dtmp#*-}"]="$d"
     fi
 done
 
@@ -160,7 +161,8 @@ done
 if [[  ${#MY_SAGE_VERSIONS[@]} -eq 1 || \
     ( "$1" && "$1" != "-n" && "$1" != "--notebook" ) ]]; then
     last_used_ver="$( cat $conf )"
-    [[ "${MY_SAGE_INSTALLATIONS[${last_used_ver#*-}]}" ]] &&
+    dtmp="${last_used_ver##*/}"
+    [[ "${MY_SAGE_INSTALLATIONS[${dtmp#*-}]}" ]] &&
         MY_SAGE_CMD="$last_used_ver/sage" ||
         MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[${MY_SAGE_VERSIONS[0]}]}/sage"
 else
@@ -192,7 +194,8 @@ ulimit -v $MAX_MEMORY
 
 # Remove cruft from the environment
 unset DIALOG MY_SAGE_DIR MY_SAGE_INSTALLATIONS MY_SAGE_VERSIONS NULL TERMINAL
-unset cols conf self rows last_used_ver ram ${COLORS[@]} COLORS MAX_MEMORY
+unset ${COLORS[@]} COLORS MAX_MEMORY
+unset cols conf d dtmp self rows last_used_ver ram
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
