@@ -23,25 +23,30 @@
 
 ##########################    USER CONFIG   ###############################
 MY_SAGE_DIR="$HOME/Installations"   # Directory where all the sage versions
-                                    # are installed. For instance, sage-5.8
-                                    # may be installed as
-                                    # $MY_SAGE_DIR/sage-5.8
-TERMINAL=""                         # Your favorite terminal
+                        # are installed. For instance, sage-5.8 may be
+                        # installed as $MY_SAGE_DIR/sage-5.8
+MAX_MEMORY=""           # The maximum amount of virtual memory in kilobytes
+                        # allowed for Sage. Typically it should be at least
+                        # 1GB. For a limit of 1.5GB, set this to 1500000.
+                        # If not set, a default of half the RAM will be set.
+TERMINAL=""             # Your favorite terminal
 ######################    END OF USER CONFIG   ############################
 
 
 
-#------------------------- Internal variables ----------------------------#
+#------------------------- Internal variables --------------------------{{{
 declare -A MY_SAGE_INSTALLATIONS
 declare -a COLORS
 declare -a MY_SAGE_VERSIONS
 declare -i cols
+declare -i ram
 declare -i rows
 NULL="/dev/null"
-DIALOG="$(which dialog 2> $NULL)" || DIALOG="$(which whiptail 2> $NULL)"
 self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
+DIALOG="$(which dialog 2> $NULL)" || DIALOG="$(which whiptail 2> $NULL)"
 MY_SAGE_CMD=""
+#-----------------------------------------------------------------------}}}
 
 #--------------- variables and functions from my_bash_functions --------{{{
 green="\x1b[1;32m"
@@ -83,6 +88,11 @@ fi
 [[ -z "$DIALOG" ]] &&
     die "Neither ${green}dialog$normal nor ${green}whiptail$normal was found in your \$PATH"
 
+# 4. Make sure we can create the config file.
+if [[ ! -f "$conf" ]]; then
+    mkdir -p "${conf%/*}" && touch "$conf" ||
+        die "Could not create file $yellow$conf$normal"
+fi
 #-----------------------------------------------------------------------}}}
 
 
@@ -130,11 +140,6 @@ get_sage_list()
 #-----------------------------------------------------------------------}}}
 
 
-if [[ ! -f "$conf" ]]; then
-    mkdir -p "${conf%/*}" && touch "$conf" ||
-        die "Could not create file $yellow$conf$normal"
-fi
-
 # Gather all the sage versions that are installed.
 for d in "$MY_SAGE_DIR"/sage-[0-9].*; do
     if [[ -x "$d/sage" ]]; then
@@ -167,12 +172,22 @@ else
     info "Proceeding with $green$MY_SAGE_CMD$normal\n"
 fi
 
-# TODO: make the max memory user configurable
-ulimit -v 3000000 # 3.0G of max virtual memory
+# Check the maximum memory set.
+ram=$( free | sed -n -e '/^Mem:/{s/^Mem:[ ]*\([0-9]\{1,\}\) .*$/\1/p}' )
+if [[ "$MAX_MEMORY" ]]; then
+    if [[ $MAX_MEMORY -gt $ram ]]; then
+        Err -w "The maximum memory set is more than the amount of RAM you
+    have in your system. This can be harmful, unless you have enough SWAP
+    space to make up for the lack of RAM"
+    fi
+else
+    MAX_MEMORY=$(( $ram/2 ))
+fi
+ulimit -v $MAX_MEMORY
 
 # Remove cruft from the environment
 unset DIALOG MY_SAGE_DIR MY_SAGE_INSTALLATIONS MY_SAGE_VERSIONS NULL TERMINAL
-unset cols conf self rows last_used_ver ${COLORS[@]} COLORS
+unset cols conf self rows last_used_ver ${COLORS[@]} COLORS MAX_MEMORY
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
