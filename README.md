@@ -5,7 +5,9 @@ Pick and execute one version of Sage from many different installed versions.
 
 While developing for [Sage](http://sagemath.org), we often have multiple
 versions of Sage installed. It would be really useful if the version of
-Sage that is desired to be run can be chosen at run time.
+Sage that is desired to be run can be chosen at run time. Additionally, the
+process is run with ulimit to ensure that it does not exceed certain memory
+limits.
 
 The following files are present in the repository.
 
