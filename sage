@@ -22,17 +22,20 @@
 
 
 ##########################    USER CONFIG   ###############################
-MY_SAGE_DIR="$HOME/Installations"   # Directory where all the sage versions
-                        # are installed. For instance, sage-5.8 may be
-                        # installed as $MY_SAGE_DIR/sage-5.8
-MAX_MEMORY=""           # The maximum amount of virtual memory in kilobytes
-                        # allowed for Sage. Typically it should be at least
-                        # 1GB. For a limit of 1.5GB, set this to 1500000.
-                        # If not set, a default of half the RAM will be set.
-TERMINAL=""             # Your favorite terminal
+MY_SAGE_DIR="$HOME/Installations"  # Directory where all the sage versions#
+                        # are installed. For instance, sage-5.8 may be    #
+                        # installed as $MY_SAGE_DIR/sage-5.8              #
+MAX_MEMORY=""           # The max amount of virtual memory in kilobytes   #
+                        # allowed to Sage. Typically it should be at least#
+                        # 1GB. For a limit of 1.5GB, set this to 1500000. #
+                        # If not set, a default of 1/2 * RAM will be set. #
+TERMINAL=""             # Your favorite terminal                          #
 ######################    END OF USER CONFIG   ############################
 
 
+#-----------: Golden rule of thumb for the user - from here onwards :-----#
+#                       "No touching. Only seeing"                        #
+#-------------------------------------------------------------------------#
 
 #------------------------- Internal variables --------------------------{{{
 declare -A MY_SAGE_INSTALLATIONS
