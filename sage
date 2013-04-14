@@ -99,7 +99,8 @@ fi
 #-----------------------------------------------------------------------}}}
 
 
-# Display help in xterm if user clicked on the file
+# Run script in $TERMINAL if user clicked on the file, or if run via
+# a desktop file.
 if [[ "$DISPLAY" ]] && ! tty -s; then
     # first find a terminal
     if [[ -z "$TERMINAL" ]]; then
