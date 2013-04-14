@@ -112,8 +112,9 @@ if [[ "$DISPLAY" ]] && ! tty -s; then
             fi
         done
     fi
-    case $TERMINAL in
-        *terminology) exec $TERMINAL -e "$(dirname "$0")/$(basename "$0") $@";;
+    case "$TERMINAL" in
+        *terminology) args="${@}" # a bad hack for disappearing arguments.
+            exec $TERMINAL -e "$(dirname "$0")/$(basename "$0") ${args}";;
         *urxvt) exec $TERMINAL -pe "" -e "$(dirname "$0")/$(basename "$0")" $@;;
         *)      exec $TERMINAL -e "$(dirname "$0")/$(basename "$0")" $@;;
     esac
