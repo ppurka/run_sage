@@ -71,12 +71,16 @@ The following files are present in the repository.
    before the script will successfully run. This directory must point to
    the directory where the sage installations are present.
 
-2. `Sage.desktop` - This is a Linux desktop file. The `Icon` field
-   within the file must be provided with the full path to a Sage icon.
-   This file must be copied to `$HOME/.local/share/applications`.
-   Thereafter, it will appear in your desktop environment's application
-   menu under Office or Education. When the menu is used, the Sage
-   notebook will be launched by executing Sage in a terminal.
+2. `Sage.desktop` - This is a Linux desktop file.  This file must be copied
+   to either the `$HOME/.local/share/applications` directory or to the
+   `/usr/share/applications` directory.  Thereafter, it will appear in
+   your desktop environment's application menu under Office or Education.
+   When the menu is used, the Sage notebook will be launched by executing
+   Sage in a terminal.
+
+3. `sage48x48.png` - This is the Sage icon which must be copied to either
+   `$HOME/.local/share/icons` directory or to the `/usr/share/pixmaps`
+   directory.
 
 User configurable variables
 ---------------------------
