@@ -21,18 +21,6 @@
 
 
 
-##########################    USER CONFIG   ###############################
-MY_SAGE_DIR="$HOME/Installations"  # Directory where all the sage versions#
-                        # are installed. For instance, sage-5.8 may be    #
-                        # installed as $MY_SAGE_DIR/sage-5.8              #
-MAX_MEMORY=""           # The max amount of virtual memory in kilobytes   #
-                        # allowed to Sage. Typically it should be at least#
-                        # 1GB. For a limit of 1.5GB, set this to 1500000. #
-                        # If not set, a default of 1/2 * RAM will be set. #
-TERMINAL=""             # Your favorite terminal                          #
-######################    END OF USER CONFIG   ############################
-
-
 #-----------: Golden rule of thumb for the user - from here onwards :-----#
 #                       "No touching. Only seeing"                        #
 #-------------------------------------------------------------------------#
@@ -49,6 +37,7 @@ self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
 DIALOG="$(which dialog 2> $NULL)"
 MY_SAGE_CMD=""
+user_conf="${conf%/*}/run_sage.conf"
 #-----------------------------------------------------------------------}}}
 
 #--------------- variables and functions from my_bash_functions --------{{{
@@ -83,23 +72,60 @@ die() {
 # 1. Check for a minimum value of bash. Need associative arrays from ver. 4
 bash --version | grep -q 'version 4' || die "Need bash version 4 or higher"
 
-# 2. Check if user provided TERMINAL is valid.
-if [[ "$TERMINAL" ]]; then
-    TERMINAL="$(which $TERMINAL 2> $NULL)" ||
-        die "$green$TERMINAL$normal not found in \$PATH."
-fi
-
-# 3. Check if dialog is present in the system.
+# 2. Check if dialog is present in the system.
 [[ -z "$DIALOG" ]] &&
     die "Could not find ${green}dialog$normal in your \$PATH. Please install dialog."
 
-# 4. Make sure we can create the config file.
+# 3. Make sure we can create the config file.
 if [[ ! -f "$conf" ]]; then
     mkdir -p "${conf%/*}" && touch "$conf" ||
         die "Could not create file $yellow$conf$normal"
 fi
-#-----------------------------------------------------------------------}}}
+if [[ ! -f "$user_conf" ]]; then
+    # config dir has been created. Try to create another config file.
+    touch "$user_conf" ||
+        die "Could not create file $yellow$user_conf$normal."
+    cat <<END > "$user_conf"
+# run_sage config file
+#
+# Directory where all the sage versions are installed. For instance,
+# sage-5.8 may be installed as $MY_SAGE_DIR/sage-5.8
+# Default: empty
+# my_sage_dir=""
+#
+# The max amount of virtual memory in kilobytes allowed to Sage. Typically
+# it should be at least# 1GB. For a limit of 1.5GB, set this to 1500000.
+# If not set, a default of 1/2 * RAM will be set.
+# max_memory=""
+#
+# Your favorite terminal. You can give the terminal name, or the full PATH
+# to the terminal.
+# Default: empty
+# terminal=""
+#
+END
+    info "It looks like you are running this script $green$self$normal for
+    the first time!
+    Please set the 'my_sage_dir' variable in the configuration file:
+    ${yellow}$user_conf$normal
+    and re-run this script."
+    exit 0
+fi
 
+# 4. Import user configs
+source "$user_conf"
+: ${MY_SAGE_DIR:=${my_sage_dir}}
+: ${MAX_MEMORY:=${max_memory:-""}}
+: ${TERMINAL:=${terminal:-""}}
+unset my_sage_dir max_memory terminal
+
+
+# 5. Check if user provided TERMINAL is valid.
+if [[ "$TERMINAL" ]]; then
+    TERMINAL="$(which $TERMINAL 2> $NULL)" ||
+        die "$green$TERMINAL$normal not found in \$PATH."
+fi
+#-----------------------------------------------------------------------}}}
 
 # Run script in $TERMINAL if user clicked on the file, or if run via
 # a desktop file.
@@ -197,7 +223,7 @@ ulimit -v $MAX_MEMORY
 # Remove cruft from the environment
 unset DIALOG MY_SAGE_DIR MY_SAGE_INSTALLATIONS MY_SAGE_VERSIONS NULL TERMINAL
 unset ${COLORS[@]} COLORS MAX_MEMORY
-unset cols conf d dtmp self rows last_used_ver ram
+unset cols conf d dtmp self rows last_used_ver ram user_conf
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
