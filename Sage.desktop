@@ -1,7 +1,7 @@
 [Desktop Entry]
 Hidden=false
 Exec=sage -n
-Icon=icon128x128.png
+Icon=sage48x48.png
 Type=Application
 NoDisplay=false
 Version=1.0
@@ -12,6 +12,6 @@ Categories=Applications;Office;Education;
 Terminal=false
 Name=Sage Notebook
 GenericName=Sage Notebook
-Icon[en_US]=icon128x128.png
+Icon[en_US]=sage48x48.png
 Name[en_US]=Sage Notebook
 Comment[en_US]=Launch Sage Notebook
