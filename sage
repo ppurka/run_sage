@@ -132,7 +132,7 @@ fi
 if [[ "$DISPLAY" ]] && ! tty -s; then
     # first find a terminal
     if [[ -z "$TERMINAL" ]]; then
-        for t in terminology urxvt konsole xterm; do
+        for t in terminology urxvt konsole gnome-terminal xterm; do
             if which $t >& $NULL; then
                 TERMINAL="$t"
                 unset t
@@ -141,7 +141,7 @@ if [[ "$DISPLAY" ]] && ! tty -s; then
         done
     fi
     case "$TERMINAL" in
-        *terminology) args="${@}" # a bad hack for disappearing arguments.
+        *terminology|*gnome-terminal) args="${@}" # a bad hack for disappearing arguments.
             exec $TERMINAL -e "$(dirname "$0")/$(basename "$0") ${args}";;
         *urxvt) exec $TERMINAL -pe "" -e "$(dirname "$0")/$(basename "$0")" $@;;
         *)      exec $TERMINAL -e "$(dirname "$0")/$(basename "$0")" $@;;
