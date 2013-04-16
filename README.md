@@ -91,7 +91,7 @@ will be automatically created the first time the script is run.
 
 1. `my_sage_dir` - This variable stores the directory where all the sage
    versions are installed. For instance, sage-5.8 may be installed as
-   `$MY_SAGE_DIR/sage-5.8`. This variable must be set.
+   `$my_sage_dir/sage-5.8`. This variable must be set.
 
 2. `max_memory` - This variable stores the maximum amount of virtual memory
    that is allowed for the Sage process. This is used to set the maximum
