@@ -54,8 +54,10 @@ MY_SAGE_CMD=""
 #--------------- variables and functions from my_bash_functions --------{{{
 green="\x1b[1;32m"
 normal="\x1b[0m"
+pink="\x1b[1;35m"
+red="\x1b[1;31m"
 yellow="\x1b[1;33m"
-COLORS=( green normal yellow )
+COLORS=( green normal pink red yellow )
 # Print out information.
 # Usage: info "Whatever you want to print"
 info(){
