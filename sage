@@ -47,7 +47,7 @@ declare -i rows
 NULL="/dev/null"
 self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
-DIALOG="$(which dialog 2> $NULL)" || DIALOG="$(which whiptail 2> $NULL)"
+DIALOG="$(which dialog 2> $NULL)"
 MY_SAGE_CMD=""
 #-----------------------------------------------------------------------}}}
 
@@ -91,7 +91,7 @@ fi
 
 # 3. Check if dialog is present in the system.
 [[ -z "$DIALOG" ]] &&
-    die "Neither ${green}dialog$normal nor ${green}whiptail$normal was found in your \$PATH"
+    die "Could not find ${green}dialog$normal in your \$PATH. Please install dialog."
 
 # 4. Make sure we can create the config file.
 if [[ ! -f "$conf" ]]; then
