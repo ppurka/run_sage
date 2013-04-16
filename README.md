@@ -9,6 +9,29 @@ Sage that is desired to be run can be chosen at run time. Additionally, the
 process is run with ulimit to ensure that it does not exceed certain memory
 limits.
 
+Installation
+------------
+To install it system-wide perform the following commands. First, remove
+any `sage` links you have already installed in `/usr/local/bin`.  This is
+because this script is called `sage` and simply copying it might overwrite
+any installed script or link called `sage`.
+
+Now, run the following commands, assuming you are in the `run_sage`
+directory and you are logged in as _root_. Alternatively, you may prefix
+each install command with `sudo `.
+
+    install -D -m 755 ./sage /usr/local/bin/sage
+    install -D -m 644 ./sage48x48.png /usr/share/pixmaps/sage48x48.png
+    install -D -m 644 ./Sage.desktop /usr/share/applications/Sage.desktop
+
+To install it in your home directory, issue the same commands, taking care
+to remove any previously installed script called `sage` in your home
+directory. Make sure to add that path to your `$PATH` environment variable.
+
+    install -D -m 755 ./sage ~/path/to/sage
+    install -D -m 644 ./sage48x48.png ~/.local/share/icons/sage48x48.png
+    install -D -m 644 ./Sage.desktop ~/.local/share/applications/Sage.desktop
+
 Behavior
 --------
 
@@ -16,7 +39,7 @@ The behavior of the script is as follows. All the arguments it receives are
 passed on to a Sage process. It tries to do "The Right Thing" depending on
 the argument that is passed to the script.
 
-1. At the very first time, run it once so that it creates the configuration
+1. _First run_: At the very first time, run it once so that it creates the configuration
    files and then set the variable `my_sage_dir` in the configuration file.
 
 2. If it is run from a graphical interface, or from the desktop file, then
