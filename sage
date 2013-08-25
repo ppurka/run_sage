@@ -174,7 +174,8 @@ get_sage_list()
 
 
 # Gather all the sage versions that are installed.
-for d in "$MY_SAGE_DIR"/sage-[0-9].*; do
+for d in "$MY_SAGE_DIR"/sage-[0-9].* "$MY_SAGE_DIR/sage" \
+    "$MY_SAGE_DIR/sage-git"; do
     if [[ -x "$d/sage" ]]; then
         dtmp="${d##*/}"
         MY_SAGE_VERSIONS+=( "${dtmp#*-}" )
