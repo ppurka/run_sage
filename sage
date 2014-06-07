@@ -93,9 +93,11 @@ if [[ ! -f "$user_conf" ]]; then
 # Default: empty
 # my_sage_dir=""
 #
-# The max amount of virtual memory in kilobytes allowed to Sage. Typically
-# it should be at least# 1GB. For a limit of 1.5GB, set this to 1500000.
-# If not set, a default of 1/2 * RAM will be set.
+# The max amount of virtual memory allowed to Sage. Typically it should be
+# at least 1GB. Format is of the form: <number>[kKmMgG], examples being 2G,
+# 3000m, etc. For a limit of 1.5GB, you can set this to 1500000, or
+# 1500000k or 1500M or 1.5G. If not set, a default of 1/2 * RAM will be
+# used.
 # max_memory=""
 #
 # Your favorite terminal. You can give the terminal name, or the full PATH
@@ -157,6 +159,22 @@ determine_dialog_spacing()
     rows="$(( ${out% *} - 7 ))"
     cols="$(( ${out#* } - 7 ))"
 }
+
+# Usage: get_max_memory <value>
+# Output: output in kB
+get_max_memory()
+{
+    local mem="$1"
+    case "$mem" in
+        [0-9\.]*[kK]) mem="${mem:0:-1}" ;;
+        [0-9\.]*[mM]) mem=$(awk "BEGIN{print ${mem:0:-1}*1024}") ;;
+        [0-9\.]*[gG]) mem=$(awk "BEGIN{print ${mem:0:-1}*1024*1024}") ;;
+        [0-9\.]*)     ;;
+        *)            return 1;;
+    esac
+    echo "${mem%.*}" # Remove floating point
+}
+
 # Usage: get_sage_list
 # Output: sage-ver sage-ver on/off sage-ver2 sage-ver2 on/off ....
 get_sage_list()
@@ -211,6 +229,8 @@ fi
 # Check the maximum memory set.
 ram=$( free | sed -n -e '/^Mem:/{s/^Mem:[ ]*\([0-9]\{1,\}\) .*$/\1/p}' )
 if [[ "$MAX_MEMORY" ]]; then
+    MAX_MEMORY=$(get_max_memory $MAX_MEMORY) ||
+        die "$MAX_MEMORY: Invalid memory specification."
     if [[ $MAX_MEMORY -gt $ram ]]; then
         Err -w "The maximum memory set is more than the amount of RAM you
     have in your system. This can be harmful, unless you have enough SWAP
