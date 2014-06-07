@@ -101,7 +101,9 @@ will be automatically created the first time the script is run.
 
    This prevents some very computational process from bringing down the
    whole system. The default amount is set to half the RAM present in the
-   system.
+   system. This should be specified in the form `<number>[kKmMgG]`,
+   examples being `2G`, `3000m`, etc. For a limit of `1.5GB`, you can set
+   this to `1500000`, or `1500000k` or `1500M` or `1.5G`.
 
 3. `terminal` - This variable sets the terminal that is used if the script
    is called from a desktop file. It need not be set. The script will
