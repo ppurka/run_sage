@@ -245,6 +245,7 @@ ulimit -v $MAX_MEMORY
 unset DIALOG MY_SAGE_DIR MY_SAGE_INSTALLATIONS MY_SAGE_VERSIONS NULL TERMINAL
 unset ${COLORS[@]} COLORS MAX_MEMORY
 unset cols conf d dtmp self rows last_used_ver ram user_conf
+unset -f Err die info determine_dialog_spacing get_max_memory get_sage_list
 
 # Execute the main command
 exec $MY_SAGE_CMD ${@}
