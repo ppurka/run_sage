@@ -118,7 +118,7 @@ Dependencies
 ------------
 
 The script depends on bash-4.0 or higher, xterm (or some other terminal),
-sed, grep, and dialog. On a Debian Linux derivative, or Fedora Linux
+awk, sed, grep, and dialog. On a Debian Linux derivative, or Fedora Linux
 derivative, you will have to install dialog since it is not installed by
 default.
 
