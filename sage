@@ -6,7 +6,7 @@
         #-----------------------------------------------------------#
 
         #----------------- License: GPL-3 or later -----------------#
-        # Copyright (C) 2013  P. Purkayastha                        #
+        # Copyright (C) 2013-2020  P. Purkayastha                   #
         # Contact: ppurka _at_ gmail _dot_ com                      #
         # This program comes with ABSOLUTELY NO WARRANTY;           #
         # This is free software, and you are welcome to redistribute#
@@ -32,6 +32,7 @@ declare -a MY_SAGE_VERSIONS
 declare -i cols
 declare -i ram
 declare -i rows
+declare    sagever
 NULL="/dev/null"
 self="${0##*\/}"
 conf="$HOME/.config/$self.conf"
@@ -70,7 +71,7 @@ die() {
 
 #------------------------ Sanity checks --------------------------------{{{
 # 1. Check for a minimum value of bash. Need associative arrays from ver. 4
-bash --version | grep -q 'version 4' || die "Need bash version 4 or higher"
+bash --version | egrep -q 'version [4-9]' || die "Need bash version 4 or higher"
 
 # 2. Check if dialog is present in the system.
 [[ -z "$DIALOG" ]] &&
@@ -205,26 +206,35 @@ done
 [[ -z "${MY_SAGE_VERSIONS[@]}" ]] && die "No sage installations found"
 
 # Handle the case when it is not run as notebook
-if [[  ${#MY_SAGE_VERSIONS[@]} -eq 1 || \
+declare last_used_ver=""
+if [[ -f "$conf" ]]; then
+    last_used_ver="$(< "$conf")"
+    [[ -n "$last_used_ver" && -x "${last_used_ver}/sage" ]] || last_used_ver=""
+fi
+
+if [[ ${#MY_SAGE_VERSIONS[@]} -eq 1 ||
     ( "$1" && "$1" != "-n" && "$1" != "--notebook" ) ]]; then
-    last_used_ver="$( cat $conf )"
-    dtmp="${last_used_ver##*/}"
-    [[ "${MY_SAGE_INSTALLATIONS[${dtmp#*-}]}" ]] &&
-        MY_SAGE_CMD="$last_used_ver/sage" ||
-        MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[${MY_SAGE_VERSIONS[0]}]}/sage"
+    if [[ -z "$last_used_ver"           || \
+          "${last_used_ver}" != "${MY_SAGE_INSTALLATIONS[${MY_SAGE_VERSIONS[0]}]}" ]]; then
+        MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[${MY_SAGE_VERSIONS[0]}]}"
+    else
+        MY_SAGE_CMD="${last_used_ver}"
+    fi
+
 else
-    out=$( get_sage_list )
+    sagever=$( get_sage_list )
     determine_dialog_spacing
-    out="$( $DIALOG --stdout --title "Choose a Sage Installation" \
+    sagever="$( $DIALOG --stdout --title "Choose a Sage Installation" \
                 --radiolist "Choose a Sage Installation" \
-                $rows $cols $(( $rows - 4 )) ${out}
+                $rows $cols $(( $rows - 4 )) ${sagever}
           )"
     [[ $? -ne 0 ]] && exit
-    MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[$out]}/sage"
-    echo "${MY_SAGE_INSTALLATIONS[$out]}" > "$conf"
-    echo
-    info "Proceeding with $green$MY_SAGE_CMD$normal\n"
+    MY_SAGE_CMD="${MY_SAGE_INSTALLATIONS[$sagever]}"
 fi
+[[ "$(< "$conf")" != "$MY_SAGE_CMD" ]] &&
+    echo "${MY_SAGE_CMD}" > "$conf"
+MY_SAGE_CMD+="/sage"
+info "Proceeding with $green$MY_SAGE_CMD$normal\n"
 
 # Check the maximum memory set.
 ram=$( free | sed -n -e '/^Mem:/{s/^Mem:[ ]*\([0-9]\{1,\}\) .*$/\1/p}' )
